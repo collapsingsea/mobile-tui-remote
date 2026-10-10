@@ -3,7 +3,7 @@
   const storageKey = 'mobile-tui-remote.language';
   const messages = {
     en: {
-      keyboard: '⌨ Keyboard', copy: 'Copy', paste: 'Paste', touchpad: 'Touchpad', reconnect: 'Reconnect',
+      keyboard: '⌨ PC', phoneIME: 'Phone IME', bottom: 'Latest', selection: 'Terminal text selection layer', pcKeyboard: 'PC keyboard', unmapped: '{key} is not mapped', copy: 'Copy', paste: 'Paste', touchpad: 'Touchpad', reconnect: 'Reconnect',
       language: 'Interface language', auto: 'Auto', input: 'Terminal input',
       connecting: 'Connecting…', connected: 'Connected', disconnected: 'Disconnected · reconnecting', error: 'Network error',
       keyboardOpened: 'Keyboard opened', selectFirst: 'Select text first', copied: 'Copied', copyFailed: 'Copy failed',
@@ -11,7 +11,7 @@
       touchpadMode: 'Touchpad mode', selectionMode: 'Text selection mode'
     },
     zh: {
-      keyboard: '⌨ 键盘', copy: '复制', paste: '粘贴', touchpad: '触控板', reconnect: '重连',
+      keyboard: '⌨ 电脑', phoneIME: '手机输入', bottom: '最新', selection: '终端文字选择层', pcKeyboard: '电脑键盘', unmapped: '{key} 未映射', copy: '复制', paste: '粘贴', touchpad: '触控板', reconnect: '重连',
       language: '界面语言', auto: '自动', input: '终端输入',
       connecting: '连接中…', connected: '已连接', disconnected: '连接已断开 · 重连中', error: '网络错误',
       keyboardOpened: '键盘已打开', selectFirst: '请先选择文本', copied: '已复制', copyFailed: '复制失败',
@@ -37,6 +37,7 @@
       element.setAttribute('aria-label', t(element.dataset.i18nLabel));
     });
     document.getElementById('language').value = preference;
+    window.dispatchEvent(new Event('mobile-tui-languagechange'));
   }
   document.getElementById('language').addEventListener('change', event => {
     preference = ['auto', 'en', 'zh'].includes(event.target.value) ? event.target.value : 'auto';

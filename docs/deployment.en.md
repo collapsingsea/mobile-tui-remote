@@ -13,7 +13,7 @@ sudo mkdir -p /var/www/mobile-tui-remote
 sudo cp -r web/. /var/www/mobile-tui-remote/
 ```
 
-Then set the Nginx `alias` to `/var/www/mobile-tui-remote/`. Repeat the copy after frontend updates, including `i18n.js` and `vendor/`.
+Then set the Nginx `alias` to `/var/www/mobile-tui-remote/`. Repeat the copy after frontend updates, including `app.js`, `app.css`, `i18n.js`, the manifest and `vendor/`.
 
 These package commands and configuration paths are for Debian/Ubuntu. Use the equivalents for your distribution.
 

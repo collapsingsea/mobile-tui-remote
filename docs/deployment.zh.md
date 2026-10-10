@@ -13,7 +13,7 @@ sudo mkdir -p /var/www/mobile-tui-remote
 sudo cp -r web/. /var/www/mobile-tui-remote/
 ```
 
-此时将 Nginx 的 `alias` 设为 `/var/www/mobile-tui-remote/`。更新版本后需要再次复制网页，包括 `i18n.js` 和 `vendor/`。
+此时将 Nginx 的 `alias` 设为 `/var/www/mobile-tui-remote/`。更新版本后需要再次复制完整网页，包括 `app.js`、`app.css`、`i18n.js`、manifest 和 `vendor/`。
 
 以下安装命令适用于 Debian/Ubuntu；其他发行版请使用对应的软件包和 Nginx 配置目录。
 
