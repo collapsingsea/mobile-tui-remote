@@ -1,0 +1,27 @@
+# Replace YOUR_VPN_IP with the server's private VPN interface address.
+# Replace /opt/mobile-tui-remote/web/ with the absolute path of your web/ folder.
+# Install as a server block in your Nginx configuration.
+# Do NOT replace the listen address with 0.0.0.0 or port-forward it publicly.
+server {
+    listen YOUR_VPN_IP:8080;
+    server_name _;
+
+    location = /mobile {
+        return 302 /mobile/;
+    }
+    location /mobile/ {
+        alias /opt/mobile-tui-remote/web/;
+        index index.html;
+        add_header Cache-Control "no-store";
+    }
+    location = /mobile/ws {
+        proxy_pass http://127.0.0.1:7690;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;
+    }
+}
