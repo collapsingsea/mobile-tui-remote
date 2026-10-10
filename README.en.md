@@ -8,13 +8,15 @@ Control a real terminal on your Linux server from your phone's browser. Original
 
 The Python backend connects to tmux; the web frontend displays the terminal and sends input. Uploading `web/` to a static hosting service alone will not work. Both the page and WebSocket backend must be served through the same address.
 
+**v0.1.1** adds automatic Chinese/English UI selection and complete bilingual usage and deployment documentation.
+
 ## Features
 
 - Live xterm.js terminal over WebSocket and PTY, backed by a persistent tmux session.
 - Esc, Ctrl+C, Tab, Enter and arrow-key buttons.
 - Mobile keyboard input, terminal-selection copy and clipboard paste.
 - Connection status, automatic reconnect and terminal resizing.
-- Initial touchpad mode: dragging sends arrow keys; tapping sends Enter.
+- Touchpad mode: dragging sends arrow keys; tapping sends Enter.
 - Static frontend with no npm install or build step.
 - Automatic Chinese/English UI selection, with a manual switch and saved preference.
 
@@ -84,15 +86,11 @@ Only the client's buttons, status messages and notifications are translated. Cla
 
 If you change the session name, use the same name in commands that create the session and start your application. Long-running service example: [systemd](deploy/mobile-tui.service.example).
 
-## Current limitations
+## Usage notes
 
-- Touchpad gestures send arrow keys, not terminal mouse-wheel events; this is not a full history browser.
-- Copy relies on xterm selection; native mobile long-press selection still needs improvement. Clipboard features require browser permission and a secure context.
-- Chinese IME composition and soft-keyboard overlap need further device testing.
-- Multiple clients share the same session input and terminal size.
-- No separate history UI, native text mirror, full PC keyboard or offline PWA support.
+In touchpad mode, dragging sends arrow keys and tapping sends Enter. Select terminal text before copying. Clipboard operations require browser permission. Clients connected to the same tmux session share input and terminal dimensions.
 
-See [ROADMAP.md](ROADMAP.md) for planned work and [CHANGELOG.md](CHANGELOG.md) for recorded changes. Reports with reproduction steps and browser versions are welcome.
+See [CHANGELOG.md](CHANGELOG.md) for version changes. Feedback through Issues with reproduction steps and browser versions is welcome.
 
 ## Development checks
 
