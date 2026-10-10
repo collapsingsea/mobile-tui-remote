@@ -2,108 +2,108 @@
 
 [English](README.en.md) | 简体中文
 
-在手机浏览器里操作服务器上的真实终端，最初为远程使用 **Claude Code** 编写，也可以运行 shell 和其他终端程序。
+用手机浏览器操作自己 Linux 服务器上的真实终端。最初为 **Claude Code** 编写，也支持 shell 和其他终端应用，使用 WebSocket → PTY → tmux 桥接。
 
-这是运行在你自己 Linux 服务器上的手机终端入口。**在服务器安装 → 配置访问地址 → 用手机浏览器打开**，手机无需安装本项目。
+**v0.2.0** 加入真实 TUI 触摸滚动、原生文字选择、电脑键盘、中英文控件，以及完整保留的开发历史快照。
 
-服务器上的 Python 后端负责连接 tmux，网页负责显示与输入。仅将 `web/` 上传到静态网站托管平台无法控制终端，网页和 WebSocket 后端必须通过同一个访问地址提供服务。
+## 在服务器安装
 
-**v0.1.1** 支持中英文界面自动适配，提供完整双语使用说明与部署教程。
-
-## 功能
-
-- xterm.js 显示真实终端，WebSocket + PTY 连接持久 tmux 会话。
-- Esc、Ctrl+C、Tab、Enter 和方向键快捷按钮。
-- 打开手机键盘输入，复制终端选区、粘贴剪贴板。
-- 连接状态提示、断线自动重连、窗口尺寸同步。
-- 可切换触控板模式：滑动发送方向键，轻点发送 Enter。
-- 静态前端，无需 npm 安装或构建。
-- 按浏览器首选语言自动选择中英文；右上角可手动切换并记住偏好。
-
-```text
-手机浏览器 → HTTPS/WSS + 身份验证 → Python PTY 桥接 → tmux → Claude Code / shell
-```
-
-## 1. 在服务器安装
-
-服务端需要 Linux、Python 3.10+、tmux；客户端需要现代手机浏览器。Claude Code 由你自行安装和登录。
+需要 Linux、Python 3.10+、tmux、现代手机浏览器，以及有身份验证的反向代理或私有网络。终端应用由你自行安装和登录。
 
 ```bash
+# Debian/Ubuntu；其他发行版使用对应的软件包。
+sudo apt-get install python3-venv tmux nginx
+
 git clone https://github.com/collapsingsea/mobile-tui-remote.git
 cd mobile-tui-remote
+git checkout v0.2.0
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 
 cp .env.example .env
-# 根据需要编辑 .env；它不会自动加载。
+# 将 TUI_HOME 改为你的实际主目录；后端不会自动加载 .env。
 set -a; . ./.env; set +a
 
-# 先创建 shell 会话，应用退出后仍可重新启动。
+# 先创建 shell 会话，应用退出后会话仍存在。
 bash scripts/create-session.sh
-# 如果已经安装 Claude Code，可在会话里启动它：
+# 如果已安装 Claude Code，可选：
 tmux send-keys -t claude-code:0.0 'claude' C-m
-
 python server.py
 ```
 
-后端默认监听 `127.0.0.1:7690`，不提供 HTML 页面。保持它运行，继续下一步配置网页访问。长期运行可以使用 [systemd 示例](deploy/mobile-tui.service.example)。
+也可以从 [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.0) 下载 `mobile-tui-remote-v0.2.0.zip`，解压后进入 `mobile-tui-remote/`，跳过 Git 命令执行安装。
 
-## 2. 配置访问地址
+后端默认监听 `127.0.0.1:7690`，**不提供 HTML 页面**。将完整 `web/`（含 i18n.js、CSS、vendor）部署到 `/mobile/`，代理 `/mobile/ws` 到后端。只上传到静态网站不能操作终端；无需 npm 安装或前端构建。手机无需安装本项目。
 
-选择适合自己的访问方式：
+## 配置访问地址并用手机打开
 
-| 访问方式 | 适合谁 | 手机打开什么 |
-|---|---|---|
-| 私有网络 / VPN | 个人使用，不想公开服务 | `http://服务器的VPN地址:8080/mobile/`，或私网 HTTPS 地址 |
-| 域名 + HTTPS + 登录保护 | 希望随时通过网址访问 | `https://你的域名/mobile/` |
+完整 Nginx、systemd 与登录保护说明见 [中文部署教程](docs/deployment.zh.md) 和 [英文部署教程](docs/deployment.en.md)。
 
-完整步骤和可复制的 Nginx 配置见 [部署教程](docs/deployment.zh.md)。私网方式也需要提供网页并代理 WebSocket；Python 后端默认不提供网页。通过 VPN IP 使用 HTTP 时，浏览器可能限制剪贴板；要完整使用复制粘贴，使用 HTTPS 或手机本机 SSH 转发地址。
+| 方式 | 手机地址 |
+|---|---|
+| 有身份验证的 VPN / 私有网络 | `http://服务器VPN地址:8080/mobile/` 或私网 HTTPS |
+| 域名 + HTTPS + 登录保护 | `https://你的域名/mobile/` |
+| 手机上的 SSH 本地转发 | 隧道保持连接时打开 `http://localhost:8080/mobile/` |
 
-**部署前必须为页面和 WebSocket 同时配置 HTTPS 与身份验证，或仅通过经过身份验证的私有网络 / VPN 访问。** 桥接默认只监听本机，不内置登录功能；获得访问权就等于获得该服务用户的终端权限。请阅读 [SECURITY.md](SECURITY.md)。
+页面和 WebSocket **都要**有身份验证与 HTTPS，或只允许经过身份验证的私网访问。访问者拥有运行桥接的 Linux 用户的终端权限；不要公开暴露 7690 端口。见 [SECURITY.md](SECURITY.md)。剪贴板通常需要 HTTPS / localhost 和浏览器授权。
 
-## 3. 用手机打开
+## 使用终端
 
-1. 保持服务器上的后端运行；私网方案先连接 VPN。
-2. 用手机浏览器打开上表中的 `/mobile/` 地址，公网方案先通过身份验证。
-3. 状态显示“已连接 / Connected”后，点击“键盘 / Keyboard”输入，或使用快捷键。
-4. 右上角的语言选择默认是“自动 / Auto”。它只改变网页按钮和提示，Claude Code 等终端程序的输出语言由程序自身决定。
+- 显示“已连接”后，点击“手机输入”打开输入法；使用 Esc、Ctrl+C、Tab、Enter 和方向快捷键。
+- 上下拖动会发送真实 xterm 滚轮事件；支持鼠标的全屏 TUI 在实时界面中处理滚动，保留颜色和交互区域。
+- 轻点当前光标行可移动光标并打开输入法；轻点其他 TUI 区域会转发终端鼠标点击。
+- 触摸设备长按透明 DOM 文字镜像选择文字，再点击“复制”；电脑可使用 xterm 选区。“粘贴”发送剪贴板文字。
+- “⌨ 电脑”展开电脑键盘，支持 Ctrl/Alt/Shift、导航键和 F1–F12；Caps/Win/Fn 会提示未映射。
+- “最新”发送 Ctrl+End（由终端应用处理），并将本地 xterm 滚动到底部。“重连”连接同一 tmux 会话。
 
-关闭网页不会主动结束 tmux 中的应用。重新打开可重新连接已有会话。不要把 `/mobile/ws` 当作网页打开，它是终端连接端点。
+多个客户端共用一个 tmux 会话的输入和尺寸。关闭网页只会断开该客户端，不会主动结束 tmux 应用。
 
 ## 界面语言
 
-浏览器首选语言为 `zh`、`zh-CN`、`zh-TW` 等中文语言时显示简体中文，其余默认英文。手动选择保存在当前浏览器、当前网站的本地存储中；选择“自动”即可恢复检测。若浏览器禁止本地存储，切换仍对当前页面有效，但刷新后可能需要重新选择。
+顶部提供 **自动 / English / 中文**。浏览器首选语言为中文时自动显示简体中文，其余默认英文；手动选择保存在当前浏览器和网站中。禁止本地存储时仍可在当前页面切换。切换即时更新按钮、状态、提示和无障碍标签，不重连、不清空终端。终端程序自己的输出不会被翻译。
+
+## 历史记录及边界
+
+包含两种历史：
+
+1. **开发历史**：[HISTORY.md](HISTORY.md) 说明设计阶段；[history/README.md](history/README.md) 索引 9 份前端和 5 份后端快照。上传包的 14 份源码快照逐字节保留。内部 v2.x 是早期实验编号，公开发行版本统一为 v0.2.0。部署根目录的 server.py 和 web/，不要部署归档版本。
+2. **终端滚动历史**：当前页面的 xterm 普通缓冲区最多保存 20,000 行；持久 tmux pane 按其配置保留滚动历史，断线后仍存在。普通 shell 重新连接后可按 Ctrl+B，再按 `[` 进入 tmux 复制模式查看历史，按 `q` 返回。tmux 默认历史容量随安装配置而异，需要更多历史时在创建会话前配置。
+
+全屏备用缓冲区 TUI 自己管理历史和鼠标滚轮。刷新页面不会自动将全部旧输出重放到 xterm。此版本未启用归档中的 JSONL 对话实验，也不承诺持久保存模型聊天记录。
 
 ## 配置
 
 | 变量 | 默认值 | 用途 |
 |---|---|---|
-| `TUI_HOST` | `127.0.0.1` | 桥接监听地址 |
-| `TUI_PORT` | `7690` | 桥接端口 |
-| `TUI_HOME` | 当前用户的主目录 | 子进程 HOME 和工作目录 |
-| `TMUX_SESSION` | `claude-code` | 持久 tmux 会话名 |
+| `TUI_HOST` | `127.0.0.1` | 后端监听地址 |
+| `TUI_PORT` | `7690` | 后端端口 |
+| `TUI_HOME` | 当前用户主目录 | 子进程 HOME 与工作目录 |
+| `TMUX_SESSION` | `claude-code` | 要连接的已有会话 |
+| `TMUX_SOCKET` | 空 | 自定义 tmux socket；创建脚本也使用它 |
+| `TMUX_BIN` | `/usr/bin/tmux` | tmux 可执行文件；创建脚本也使用它 |
+| `TUI_COMMAND` | 空 | 用带 shell 引号的参数列表覆盖 tmux attach；不执行 shell 展开 |
 
-修改会话名后，创建会话和启动应用的命令也要使用相同名称。
-
-## 使用说明
-
-触控板模式中，滑动发送方向键，轻点发送 Enter。复制时先在终端选择文字，剪贴板操作需要浏览器授权。连接同一个 tmux 会话的客户端会共用输入和终端尺寸。
-
-版本改动见 [CHANGELOG.md](CHANGELOG.md)。欢迎通过 Issues 提交反馈，并附上操作步骤和浏览器版本。
+创建脚本还支持 `TUI_WORKDIR`（默认 `$HOME`）和可选 `TUI_APP_COMMAND`。自定义 socket 时，手动命令使用 `tmux -S "$TMUX_SOCKET"`；自定义会话名时，启动应用也使用同名会话。长期运行见 [systemd 示例](deploy/mobile-tui.service.example)。
 
 ## 开发验证
 
 ```bash
 python -m unittest discover -s tests -v
+node --check web/app.js
+node --check web/i18n.js
+bash -n scripts/create-session.sh
 ```
 
-测试在 Linux 上运行，需要 tmux 和已安装的 Python 依赖；测试使用独立 tmux socket，不会访问你的日常会话。
+Python 测试在独立 tmux socket 上实测 PTY 输入、尺寸、异常消息、子进程退出、重连和 120 行历史。浏览器集成测试使用仓库外安装的 Playwright：
 
-完整英文说明见 [README.en.md](README.en.md)，英文部署教程见 [Deployment guide](docs/deployment.en.md)。
+```bash
+PLAYWRIGHT_MODULE=/绝对路径/node_modules/playwright/index.mjs \
+  python tests/run_browser.py
+```
+
+临时本地服务器与独立 tmux 测试真实 xterm 滚动、备用屏鼠标事件、语言保存、输入法、键盘、重连与手机布局，结束时清理进程。无需前端构建。见 [CHANGELOG.md](CHANGELOG.md) 和 [发行验证记录](docs/verification-v0.2.0.md)。
 
 ## License
 
-MIT. [LICENSE](LICENSE). Vendored xterm.js and fit addon notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-本项目是独立项目，与 Anthropic 无隶属关系；不包含 Claude Code 本体、账号、API 密钥、Cookie 或登录状态。
+MIT，见 [LICENSE](LICENSE)、[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。本项目与 Anthropic 无隶属关系；不包含 Claude Code 本体、账号、API 密钥、Cookie 或登录状态。

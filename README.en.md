@@ -2,78 +2,75 @@
 
 English | [简体中文](README.md)
 
-Control a real terminal on your Linux server from your phone's browser. Originally built for **Claude Code**, it also works with a shell and other terminal applications.
+Control a real terminal on your Linux server from your phone's browser. Originally built for **Claude Code**, the WebSocket → PTY → tmux bridge also works with shells and other terminal applications.
 
-**Install on your server → configure an access address → open it on your phone.** Your phone does not need to install this project.
+**v0.2.0** brings live TUI touch scrolling, native text selection, an optional PC keyboard, Chinese/English controls, and a preserved archive of the project's development history.
 
-The Python backend connects to tmux; the web frontend displays the terminal and sends input. Uploading `web/` to a static hosting service alone will not work. Both the page and WebSocket backend must be served through the same address.
+## Install on the server
 
-**v0.1.1** adds automatic Chinese/English UI selection and complete bilingual usage and deployment documentation.
-
-## Features
-
-- Live xterm.js terminal over WebSocket and PTY, backed by a persistent tmux session.
-- Esc, Ctrl+C, Tab, Enter and arrow-key buttons.
-- Mobile keyboard input, terminal-selection copy and clipboard paste.
-- Connection status, automatic reconnect and terminal resizing.
-- Touchpad mode: dragging sends arrow keys; tapping sends Enter.
-- Static frontend with no npm install or build step.
-- Automatic Chinese/English UI selection, with a manual switch and saved preference.
-
-```text
-Phone browser → HTTPS/WSS + authentication → Python PTY bridge → tmux → Claude Code / shell
-```
-
-## 1. Install on your server
-
-You need Linux, Python 3.10+, tmux and a modern mobile browser. Install and authenticate Claude Code separately if you want to use it.
+Requirements: Linux, Python 3.10+, tmux, a modern mobile browser, and an authenticated reverse proxy or private network. Install and authenticate your terminal application separately.
 
 ```bash
+# Debian/Ubuntu; use equivalent packages on other distributions.
+sudo apt-get install python3-venv tmux nginx
+
 git clone https://github.com/collapsingsea/mobile-tui-remote.git
 cd mobile-tui-remote
+git checkout v0.2.0
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit as needed. The backend does not load .env automatically.
+# Edit TUI_HOME to your actual home directory. The backend does not load .env.
 set -a; . ./.env; set +a
 
-# Keep a shell as the session parent so you can restart the application.
+# Create a shell-backed session first so exiting the TUI does not destroy it.
 bash scripts/create-session.sh
 # Optional, if Claude Code is already installed:
 tmux send-keys -t claude-code:0.0 'claude' C-m
-
 python server.py
 ```
 
-The backend listens on `127.0.0.1:7690` by default. It does not serve the HTML page. Keep it running while configuring access in the next step.
+You can also download `mobile-tui-remote-v0.2.0.zip` from the [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.0), unzip it, and run the setup from its `mobile-tui-remote/` directory; skip the Git commands.
 
-## 2. Choose how to access it
+The backend listens on `127.0.0.1:7690` and does **not** serve HTML. Host the entire `web/` directory at `/mobile/`, including `i18n.js`, CSS and `vendor/`; proxy `/mobile/ws` to the backend. A static hosting service alone cannot control a terminal. No npm install or frontend build is required.
 
-| Access method | Suitable for | Address to open on your phone |
-|---|---|---|
-| Private network / VPN | Personal use without a public service | `http://SERVER_VPN_IP:8080/mobile/`, or a private HTTPS address |
-| Domain + HTTPS + authentication | Access through a regular website address | `https://YOUR_DOMAIN/mobile/` |
+## Configure access and open on your phone
 
-Follow the [deployment guide](docs/deployment.en.md) for complete Nginx examples. Both methods serve `web/` at `/mobile/` and proxy `/mobile/ws` to the backend. HTTP over a VPN IP may restrict browser clipboard access; use HTTPS or an SSH tunnel to a phone-local address for clipboard features.
+Use the [English deployment guide](docs/deployment.en.md) or [Chinese guide](docs/deployment.zh.md) for complete Nginx, systemd and authentication instructions.
 
-**Protect both the page and WebSocket endpoint with HTTPS and authentication, or restrict them to an authenticated private network/VPN.** Terminal access gives the permissions of the Linux user running the bridge. Never expose the backend port directly to the Internet. See [SECURITY.md](SECURITY.md).
+| Method | Phone address |
+|---|---|
+| Authenticated VPN/private network | `http://SERVER_VPN_IP:8080/mobile/` or private HTTPS |
+| Domain + HTTPS + authentication | `https://YOUR_DOMAIN/mobile/` |
+| SSH forwarding from the phone | `http://localhost:8080/mobile/` while the phone's tunnel is open |
 
-## 3. Open it on your phone
+Protect **both** the page and WebSocket with authentication and HTTPS, or restrict them to an authenticated private network. Access controls the terminal as the Linux user running the bridge. Do not expose port 7690 directly. See [SECURITY.md](SECURITY.md). Clipboard access generally requires HTTPS or localhost and browser permission.
 
-1. Keep the server backend running. Connect to your VPN first if using private access.
-2. Open the `/mobile/` address in your phone browser. Authenticate if using the public HTTPS setup.
-3. Once the status says **Connected**, tap **Keyboard** to type or use the quick keys.
-4. Use the language selector in the top bar to choose **Auto**, **English** or **中文**.
+## Use the terminal
 
-Closing the page does not intentionally stop the application in tmux. Reopening reconnects to the existing session. `/mobile/ws` is a WebSocket endpoint, not a page to open directly.
+- Wait for **Connected**. Tap **Phone IME** to type; use Esc, Ctrl+C, Tab, Enter and arrows for quick input.
+- Drag vertically to send actual xterm wheel events. Full-screen mouse-aware TUIs handle these in their live screen; they retain their colors and interactive regions.
+- Tap the active cursor row to move the cursor and open the phone keyboard. Tap other TUI regions to forward a terminal mouse click.
+- Long-press on a touch device to select the transparent DOM text mirror; tap **Copy**. Desktop clients can use xterm selection. **Paste** sends clipboard text to the terminal.
+- **⌨ PC** toggles the extended keyboard, including Ctrl/Alt/Shift, navigation and F1–F12. Caps/Win/Fn display an unmapped-key notice.
+- **Latest** sends Ctrl+End (handled by the remote application) and moves local xterm scrollback to the bottom. **Reconnect** reconnects to the same tmux session.
+
+Clients sharing one tmux session share input and terminal dimensions. Closing a page detaches its client; it does not terminate the tmux application.
 
 ## Interface language
 
-Auto mode uses the browser's preferred language: `zh`, `zh-CN`, `zh-TW` and other Chinese locales select Simplified Chinese; all other languages select English. Manual preferences are saved per browser and website. Select **Auto** to return to detection. If local storage is blocked, switching still works for the current page but may not survive a reload.
+The top bar offers **Auto / English / 中文**. Auto selects Simplified Chinese for Chinese browser locales and English otherwise. Manual preferences are saved per browser and website. If local storage is blocked, switching works for the current page. Changing language updates controls, status, notices and accessibility labels without reconnecting or clearing the terminal. Terminal output belongs to the remote program and is not translated.
 
-Only the client's buttons, status messages and notifications are translated. Claude Code and other terminal programs control their own output language.
+## History and its limits
+
+Two kinds of history are included:
+
+1. **Development archive:** [HISTORY.md](HISTORY.md) explains the design phases; [history/README.md](history/README.md) indexes 9 frontend and 5 backend snapshots. All 14 uploaded source snapshots are preserved byte for byte. Their internal v2.x labels describe historical experiments, not the public release version. Deploy the root `server.py` and `web/`, not these archives.
+2. **Terminal scrollback:** xterm retains up to 20,000 normal-buffer lines in the current page. The persistent tmux pane retains its configured scrollback across disconnects. For a regular shell, enter tmux copy mode with Ctrl+B then `[` to browse retained history after reopening, and `q` to leave. Tmux's default history limit is installation dependent; configure it before creating the session if you need more lines.
+
+Full-screen alternate-buffer TUIs manage their own history and mouse-wheel behavior. Reloading the page does not automatically replay all old output into xterm. v0.2.0 does not enable the archived JSONL transcript experiment or promise persistent model-chat transcripts.
 
 ## Configuration
 
@@ -81,27 +78,32 @@ Only the client's buttons, status messages and notifications are translated. Cla
 |---|---|---|
 | `TUI_HOST` | `127.0.0.1` | Backend bind address |
 | `TUI_PORT` | `7690` | Backend port |
-| `TUI_HOME` | Current user's home | Child process HOME and working directory |
-| `TMUX_SESSION` | `claude-code` | Persistent tmux session name |
+| `TUI_HOME` | Current user's home | Child HOME and working directory |
+| `TMUX_SESSION` | `claude-code` | Existing session to attach |
+| `TMUX_SOCKET` | Empty | Custom tmux socket (also used by the session script) |
+| `TMUX_BIN` | `/usr/bin/tmux` | Tmux executable (also used by the session script) |
+| `TUI_COMMAND` | Empty | Shell-quoted argv overriding tmux attach; no shell expansion |
 
-If you change the session name, use the same name in commands that create the session and start your application. Long-running service example: [systemd](deploy/mobile-tui.service.example).
-
-## Usage notes
-
-In touchpad mode, dragging sends arrow keys and tapping sends Enter. Select terminal text before copying. Clipboard operations require browser permission. Clients connected to the same tmux session share input and terminal dimensions.
-
-See [CHANGELOG.md](CHANGELOG.md) for version changes. Feedback through Issues with reproduction steps and browser versions is welcome.
+The session script also accepts `TUI_WORKDIR` (defaults to `$HOME`) and optional `TUI_APP_COMMAND`. With a custom socket, use `tmux -S "$TMUX_SOCKET"` in manual tmux commands. With a custom session, use that name when starting the TUI. See the [systemd example](deploy/mobile-tui.service.example) for persistent operation.
 
 ## Development checks
 
 ```bash
 python -m unittest discover -s tests -v
+node --check web/app.js
+node --check web/i18n.js
+bash -n scripts/create-session.sh
 ```
 
-Run on Linux with tmux and the Python dependencies installed. Tests use an isolated tmux socket and do not access your everyday sessions.
+Python tests exercise real PTY input, resize, invalid controls, child exit, reconnect and 120 lines of tmux history on an isolated socket. The browser integration test uses Playwright installed outside this repository:
+
+```bash
+PLAYWRIGHT_MODULE=/absolute/path/to/node_modules/playwright/index.mjs \
+  python tests/run_browser.py
+```
+
+It runs temporary local servers and isolated tmux, checks real xterm scrolling and alternate-screen mouse events, language switching/storage, IME, keyboard controls, reconnect, and mobile layout, then stops its processes. No frontend build step is needed. See [CHANGELOG.md](CHANGELOG.md) and [release verification](docs/verification-v0.2.0.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the vendored xterm.js files.
-
-Independent project, not affiliated with Anthropic. Does not include Claude Code, accounts, API keys, cookies or login state.
+MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Independent project, not affiliated with Anthropic. No Claude Code binaries, accounts, API keys, cookies or login state are included.

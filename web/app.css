@@ -1,0 +1,158 @@
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --line: #30363d;
+  --fg: #c9d1d9;
+  --accent: #7ee787;
+  --muted: #8b949e;
+  --danger: #ff7b72;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+#app { height: 100%; display: flex; flex-direction: column; }
+#topbar {
+  height: 34px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 12px;
+}
+.brand { margin-left: auto; color: var(--muted); white-space: nowrap; font-size: 11px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #f85149; }
+.dot.ok { background: var(--accent); }
+#status { color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#language { max-width: 86px; flex-shrink: 0; background: #21262d; color: var(--fg); border: 1px solid var(--line); border-radius: 5px; font: inherit; padding: 3px; }
+
+#terminal {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px 4px 0;
+  touch-action: pan-y;
+}
+.xterm { height: 100%; }
+.xterm-viewport { overscroll-behavior: contain; }
+
+/* Transparent DOM mirror: Android can long-press real text while xterm remains visible. */
+#nativeText {
+  position: absolute;
+  inset: 4px 4px 0 4px;
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: pan-y;
+  user-select: text;
+  -webkit-user-select: text;
+  white-space: pre;
+  color: rgba(255,255,255,.001);
+  font: 12px/1.15 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+#nativeText .nline {
+  height: var(--native-line-h, 16px);
+  line-height: var(--native-line-h, 16px);
+  white-space: pre;
+}
+#nativeText ::selection {
+  background: rgba(38,79,120,.72);
+  color: rgba(255,255,255,.01);
+}
+@media (pointer: fine) {
+  #nativeText { pointer-events: none; }
+}
+
+.quickbar, .actionbar {
+  display: grid;
+  gap: 5px;
+  padding: 6px;
+  flex: 0 0 auto;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+.quickbar { grid-template-columns: repeat(8, 1fr); }
+.actionbar { grid-template-columns: repeat(3, 1fr); padding-top: 0; }
+button {
+  min-width: 0;
+  height: 38px;
+  padding: 0 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #21262d;
+  color: var(--fg);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button:active { background: #30363d; }
+button.active { border-color: var(--accent); color: var(--accent); background: #17251b; }
+.danger { color: var(--danger); }
+
+#pc {
+  display: none;
+  max-height: 48vh;
+  overflow: auto;
+  padding: 6px;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+#pc.show { display: block; }
+.kbd { display: flex; flex-direction: column; gap: 5px; }
+.krow { display: flex; gap: 4px; }
+.krow button { flex: 1; height: 36px; font-size: 11px; }
+.krow .u125 { flex: 1.25; }
+.krow .u15 { flex: 1.5; }
+.krow .u175 { flex: 1.75; }
+.krow .u2 { flex: 2; }
+.krow .u225 { flex: 2.25; }
+.krow .u275 { flex: 2.75; }
+.krow .u6 { flex: 6; }
+.kbdtop { margin-bottom: 3px; }
+.kbdtop button { height: 32px; font-size: 10px; }
+.navrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 2px; }
+
+#ime {
+  position: fixed;
+  left: 4px;
+  bottom: 4px;
+  width: 2px;
+  height: 2px;
+  opacity: .01;
+  border: 0;
+  padding: 0;
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  display: none;
+  z-index: 100;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #21262d;
+  font-size: 12px;
+}
+.toast.show { display: block; }
+
+body.keyboard .actionbar,
+body.keyboard #pc { display: none !important; }
+body.keyboard #topbar { height: 28px; }
+body.keyboard .quickbar { padding: 4px 6px; }
+body.keyboard .quickbar button { height: 34px; }
