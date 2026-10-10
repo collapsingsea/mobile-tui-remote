@@ -1,0 +1,17 @@
+name: Check
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y tmux
+      - run: python -m pip install -r requirements.txt
+      - run: python -m compileall -q server.py tests
+      - run: bash -n scripts/create-session.sh
+      - run: python -m unittest discover -s tests -v

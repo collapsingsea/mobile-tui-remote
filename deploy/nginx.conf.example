@@ -1,0 +1,27 @@
+# Add these locations INSIDE an existing HTTPS server block.
+# At server level, protect BOTH locations with authentication, for example:
+# auth_basic "Mobile TUI";
+# auth_basic_user_file /etc/nginx/mobile-tui.htpasswd;
+# Create that password file before enabling this configuration.
+# Alternatively restrict access to an authenticated private network/VPN.
+
+location = /mobile {
+    return 302 /mobile/;
+}
+
+location /mobile/ {
+    alias /opt/mobile-tui-remote/web/;
+    index index.html;
+    add_header Cache-Control "no-store";
+}
+
+location = /mobile/ws {
+    proxy_pass http://127.0.0.1:7690;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_read_timeout 86400s;
+    proxy_send_timeout 86400s;
+    proxy_buffering off;
+}
