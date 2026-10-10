@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
 const { chromium } = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
 const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined, args: ['--no-sandbox'] });
 const base = process.env.TEST_BASE_URL;
@@ -89,12 +90,20 @@ try {
   await page.click('#pcbtn');
   // Clear typed escape sequences before another shell command.
   await page.click('[data-key="ctrlc"]');
+  await send(page, "i=1; while [ $i -le 120 ]; do printf 'BROWSER_SCROLL_%03d\\n' $i; i=$((i+1)); done; printf 'RECONNECT_%s\\n' READY\r");
+  await waitText(page, 'RECONNECT_READY');
   const beforeReconnect = await page.evaluate(() => window.__connections);
   await page.click('#reconnectbtn');
   await page.waitForFunction(n => window.__connections === n + 1 && document.querySelector('#status').textContent === 'Connected', beforeReconnect);
-  await page.waitForFunction(() => window.__outputByConnection[window.__connections].includes('BROWSER_READY'));
+  await page.waitForFunction(() => window.__outputByConnection[window.__connections].includes('RECONNECT_READY'));
   await send(page, "printf 'PERSIST_%s\\n' \"$MOBILE_BROWSER_TEST\"\r");
   await waitText(page, 'PERSIST_kept');
+  // Browse server-retained history in the real browser after reconnect.
+  await send(page, '\x02[');
+  execFileSync(process.env.TMUX_BIN || '/usr/bin/tmux', ['-S', process.env.TMUX_SOCKET, 'send-keys', '-X', '-t', 'browser:0.0', 'history-top']);
+  await waitText(page, 'BROWSER_SCROLL_001');
+  await send(page, 'q');
+  console.log('PASS reconnected browser browsed retained tmux history BROWSER_SCROLL_001 via copy mode');
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#status').textContent === 'Connected');
   assert.equal(await page.locator('#language').inputValue(), 'en');
@@ -109,6 +118,9 @@ try {
   await fixtureCtx.grantPermissions(['clipboard-read', 'clipboard-write']);
   const fixture = await fixtureCtx.newPage(); fixture.on('pageerror', e => errors.push(String(e)));
   await fixture.goto(`${base}/fixture/`); await waitText(fixture, 'FIXTURE_READY');
+  // app.js performs its final bootstrap fit at 300ms. Let it finish before
+  // asserting user scrolling, so that initialization cannot reset the viewport.
+  await fixture.waitForFunction(() => performance.now() > 450);
   assert.equal(await fixture.evaluate(() => window.__term.buffer.active.type), 'normal');
   await touch(fixture, 200);
   await fixture.waitForFunction(() => window.__term.buffer.active.viewportY < window.__term.buffer.active.baseY);

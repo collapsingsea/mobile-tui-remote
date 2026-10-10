@@ -36,7 +36,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/srv/openai-worker/cache/ms-playwright/chromium-1
 
 Result: **passed**, with no browser JavaScript errors.
 
-- Real same-origin browser → WebSocket → PTY → isolated tmux round trip, phone IME input and persistent session state after manual reconnect.
+- Real same-origin browser → WebSocket → PTY → isolated tmux round trip, phone IME input and persistent session state after manual reconnect. The reconnected browser entered tmux copy mode and displayed the retained `BROWSER_SCROLL_001` marker from 120 earlier lines.
 - Chinese automatic selection, English manual selection, persisted preference after reload, return to automatic detection, and switching with blocked local storage. Language changes did not open another WebSocket or clear terminal output.
 - F1–F12 emitted their expected terminal sequences; opening the PC keyboard resized and clipped the terminal so its contents could not cover keys; keyboard toggle and unmapped-key notices worked. No horizontal page overflow at 320px width.
 - A controlled WebSocket fixture fed **240 normal-buffer history lines** into the real vendored xterm. Touch forwarding moved the viewport from 201 to 189, the earliest marker remained in the buffer, Latest returned to the bottom, and the native DOM mirror selection survived pending rendering and copied the expected marker to the clipboard.
