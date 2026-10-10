@@ -124,7 +124,7 @@ try {
   });
   assert.equal(await fixture.evaluate(() => String(getSelection())), 'BROWSER_HISTORY_240');
   await fixture.click('#copybtn');
-  assert.equal(await fixture.locator('#toast').innerText(), 'Copied');
+  await fixture.waitForFunction(() => document.querySelector('#toast').textContent === 'Copied');
   assert.equal(await fixture.evaluate(() => navigator.clipboard.readText()), 'BROWSER_HISTORY_240');
   await fixture.evaluate(() => getSelection().removeAllRanges());
   await send(fixture, 'ENABLE_ALT'); await waitText(fixture, 'ALT_READY');
