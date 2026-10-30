@@ -1,5 +1,20 @@
 # Changelog
 
+## Source review — 2026-10-30 (no application version change)
+
+- Verify the original upload, all 14 archived snapshots, Git history and both v0.2.x release ZIPs; publish the evidence in Chinese and English.
+- Correct both installation guides to select the current v0.2.1 release.
+- Add a SHA-256 provenance manifest and a standalone source verification command, also run in CI.
+- Keep the application, version, existing tags, MIT license and original release assets unchanged.
+
+中文：核查上传源码、Git 历史和发行包，补充双语来源记录与校验工具，修正安装版本；没有新增功能版本。
+
+## 0.2.1 — 2026-10-16
+
+Version-only patch republication. Only `VERSION` changed from 0.2.0 to 0.2.1; application code and documentation were identical to v0.2.0.
+
+中文：仅版本号补丁重发，应用源码与文档均与 v0.2.0 相同。
+
 ## 0.2.0 — 2026-10-10
 
 - Import the uploaded live-TUI client: real touch wheel/mouse forwarding, native text mirror, phone IME, PC keyboard and manifest.

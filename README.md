@@ -6,6 +6,8 @@
 
 **v0.2.0** 加入真实 TUI 触摸滚动、原生文字选择、电脑键盘、中英文控件，以及完整保留的开发历史快照。
 
+当前公开版本为 **v0.2.1**，与 v0.2.0 相比仅修改 `VERSION`。源码来源、上传包与标签的比较，以及“0.20”命名核查见[来源核验记录](docs/source-provenance.md)。本次文档核验没有发布新的功能版本。
+
 ## 在服务器安装
 
 需要 Linux、Python 3.10+、tmux、现代手机浏览器，以及有身份验证的反向代理或私有网络。终端应用由你自行安装和登录。
@@ -16,7 +18,7 @@ sudo apt-get install python3-venv tmux nginx
 
 git clone https://github.com/collapsingsea/mobile-tui-remote.git
 cd mobile-tui-remote
-git checkout v0.2.0
+git checkout v0.2.1
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
@@ -32,7 +34,7 @@ tmux send-keys -t claude-code:0.0 'claude' C-m
 python server.py
 ```
 
-也可以从 [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.0) 下载 `mobile-tui-remote-v0.2.0.zip`，解压后进入 `mobile-tui-remote/`，跳过 Git 命令执行安装。
+也可以从 [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.1) 下载 `mobile-tui-remote-v0.2.1.zip`，解压后进入 `mobile-tui-remote/`，跳过 Git 命令执行安装。带 `reviewed-` 的附加 ZIP 使用同一应用源码，另含当前核验文档与工具；其完整提交号见同页核验说明。
 
 后端默认监听 `127.0.0.1:7690`，**不提供 HTML 页面**。将完整 `web/`（含 i18n.js、CSS、vendor）部署到 `/mobile/`，代理 `/mobile/ws` 到后端。只上传到静态网站不能操作终端；无需 npm 安装或前端构建。手机无需安装本项目。
 
@@ -90,6 +92,7 @@ python server.py
 
 ```bash
 python -m unittest discover -s tests -v
+python scripts/verify-source.py
 node --check web/app.js
 node --check web/i18n.js
 bash -n scripts/create-session.sh

@@ -16,6 +16,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y tmux
       - run: python -m pip install -r requirements.txt
       - run: python -m compileall -q server.py tests
+      - run: python scripts/verify-source.py
       - run: bash -n scripts/create-session.sh
       - run: python -m unittest discover -s tests -v
       - run: node --check web/app.js && node --check web/i18n.js && node --check tests/browser.mjs

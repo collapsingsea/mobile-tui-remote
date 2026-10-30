@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-30",
+  "original_upload": {
+    "filename": "mobile-tui-remote-v0.2.0-with-history.zip",
+    "size_bytes": 158479,
+    "sha256": "b2ddefb4e25f2b6079af63045d0fe2a5f3ff411c90f48c17ec9a0fae150a26a6",
+    "internal_version": "0.1.0",
+    "files_sha256": {
+      ".env.example": "de8b3ddac2a542a517c2d2ae6df3b02a724a85e47685fc91fe1602ddd66bcd84",
+      ".gitignore": "cb979344af3d178e7e1c7bf330cc66fbcf4c09677f9e56a7d513a3b7307ec53c",
+      "HISTORY.md": "97d404770ba4caf46a5d61602328be3b1e1dbd04151c41d7662d3f5bfac170a9",
+      "LICENSE": "f4d07b1ceeada49dfbdf1217f6149581def54a096eed8c668b68c3b6b7c6d926",
+      "README.md": "e64df47b7e95f51cb9eb721b01c04ce41a7204d765471d23284413ebbd82ed48",
+      "SECURITY.md": "1447172e05704932e4d36355cbb165ea14993aa21f0af51f4d845645b3bc71a5",
+      "THIRD_PARTY_NOTICES.md": "11b9fac5ba437e44ef3a97f02dfcbace4200d653b6cb2480ee5c11c97b9f0ee5",
+      "VERSION": "e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67",
+      "deploy/mobile-tui.service.example": "dbc58ca48646afb65581faab91ba4322d727931d6e0ee3cac3c6198f61a6bcd1",
+      "deploy/nginx.conf.example": "da08d0cfb4ddb81edd74a0e9ade830dcffbb3214a4ec179b2106b13d8b916ba0",
+      "extras/README.md": "562dbd66d3c84223d813124c202002d5d2ea565fc54969df392e65060ed7a181",
+      "extras/ttyd-copy-fix.js": "e442524ff57c647e8a633c6ae2bb89f7e13dd8246578321e5cc82431ebbf6c25",
+      "history/README.md": "6ae7aa237cb69cc67a3c9c92fccb86bec8c075d3427f02e6b9f46dd8e17280af",
+      "history/backends/00-initial-server.py": "8df7891c8abe6c2d666a15f5085a9bf4b20d6e1599b5beb670299f067716d8a0",
+      "history/backends/01-v2-server.py": "0e96aff739f4973bfdb042a3d7aebe53b4f51875ec8408c0015951eff5a01515",
+      "history/backends/02-fixed-socket-scroll.py": "47d76108fada3cc9c704a0dc61b62857cb16b166daeb06eb351d4b4fb840d614",
+      "history/backends/03-transcript-experiment.py": "c7e94a7767591bf6654596c90586630de4030836dc5d5f68937cf05c24859d37",
+      "history/backends/04-history-layer-server.py": "0b031feb8e3566d1ab5136ef4005165318ad946f95d6bcb7db01963851b1365a",
+      "history/frontends/00-initial.html": "72f05cafc37494188389dae8f537d59e61013eb404256453bd371fa6c6b4839b",
+      "history/frontends/01-v2.1-selection.html": "a7b0f3519e7cbafcf3c0e8d2e0c05628e2eb3e9b2f05f885db35562cc116ee2a",
+      "history/frontends/02-v2.2-unified.html": "6f27b99fd851f75c62cb7b423f5268c54f82975cbb0e776350699b0b7ee52f81",
+      "history/frontends/03-v2.4-freeze.html": "6c919dc5817a37f1f4eb8f96201b73dd09bf1eaa7d5651a745aeb92fdb94e7b6",
+      "history/frontends/04-v2.7-native-selection.html": "1e7cb4d92010e97b4effb84d9987513bc33d5e23055e1b5366cb44c481ae8cf9",
+      "history/frontends/05-v2.9-native-text-mirror.html": "7529ed6ae3f06751b2f6179aaddb3c7cc025f1ecc52f5e3d022ec3be66bbd2da",
+      "history/frontends/06-v2.12-local-scroll.html": "406befd30bd7cff743a36b5348c5161f62a386645419219a507a2f8c92d82946",
+      "history/frontends/07-v2.15-history-layer.html": "390a708a2abad714175a0fc440cf30dc52d00ee1d651a5d1ff6962b0d97a2efa",
+      "history/frontends/08-v2.18-seamless-history.html": "6cdf0faab1a1de54289be473e55ef930fa5b4738e05cb2b17b680d81fbc65c63",
+      "requirements.txt": "0405892d8a87ecc937d627e94cc2905a5ac396f26fdd314f9a0a3673a1448f21",
+      "scripts/create-session.sh": "2f18d1de0a7950eed460e161a7aa31aaf9725cd312033c84fd63e520a61973d8",
+      "server.py": "835a4496724b07b285d62629b4fefa5ba2e28d0fc5b562ae87ca87d70d136a2b",
+      "web/app.css": "47d4d46ddc9ee00e109c474236a19aa6c7b7330c5fcbcb9632c70ed2f9482c96",
+      "web/app.js": "f8e499380e3508f769475a73d0c928d35c6905ca3afd2cd51f0ae42ca49690b9",
+      "web/index.html": "b7546b26ca0c693d29ade654555cc31fa66aaf4f409ab1a16d5638bda11e303c",
+      "web/manifest.webmanifest": "8a002577a12cc731dde126b975caa4379683162e98ec8722d8ceb35e889ddd69",
+      "web/vendor/addon-fit.js": "bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089",
+      "web/vendor/xterm.css": "88ce023a712d20edbbdbfbe81258362576cb7c2d2b51ec8bf37090498b015a37",
+      "web/vendor/xterm.js": "1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495"
+    }
+  },
+  "public_releases": {
+    "v0.2.0": {
+      "commit": "fbc19c88f0a6b9d05b0bc5b439c00b6e7eff9300",
+      "zip_sha256": "12c99f1b80d6440d0420843f4c61f664f674ef498f1bea365fcd63fed421ecc4",
+      "zip_size_bytes": 189152
+    },
+    "v0.2.1": {
+      "commit": "d6277f071b084099b8e21bda91a04300c56da433",
+      "zip_sha256": "bc4e755202a9819768b3acb712efb209931c9995cc5196a0811704c6b3e16a2f",
+      "zip_size_bytes": 189152
+    }
+  },
+  "earlier_upload": {
+    "filename": "mobile-tui-remote-v0.1.0.zip",
+    "size_bytes": 86080,
+    "sha256": "4f42fed8fa62e390489fe3df673b2e28ff7afd8dfc49df04c1341163aaaff96b",
+    "common_files_identical": 21,
+    "history_files_added_by_later_upload": 16
+  }
+}
