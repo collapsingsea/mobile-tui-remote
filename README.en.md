@@ -6,6 +6,8 @@ Control a real terminal on your Linux server from your phone's browser. Original
 
 **v0.2.0** brings live TUI touch scrolling, native text selection, an optional PC keyboard, Chinese/English controls, and a preserved archive of the project's development history.
 
+The current public version is **v0.2.1**; its only change from v0.2.0 is `VERSION`. See the [source provenance record](docs/source-provenance.md) for upload/tag comparisons and the investigation of the “0.20” name. This documentation review does not introduce a new application version.
+
 ## Install on the server
 
 Requirements: Linux, Python 3.10+, tmux, a modern mobile browser, and an authenticated reverse proxy or private network. Install and authenticate your terminal application separately.
@@ -16,7 +18,7 @@ sudo apt-get install python3-venv tmux nginx
 
 git clone https://github.com/collapsingsea/mobile-tui-remote.git
 cd mobile-tui-remote
-git checkout v0.2.0
+git checkout v0.2.1
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
@@ -32,7 +34,7 @@ tmux send-keys -t claude-code:0.0 'claude' C-m
 python server.py
 ```
 
-You can also download `mobile-tui-remote-v0.2.0.zip` from the [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.0), unzip it, and run the setup from its `mobile-tui-remote/` directory; skip the Git commands.
+You can also download `mobile-tui-remote-v0.2.1.zip` from the [Release](https://github.com/collapsingsea/mobile-tui-remote/releases/tag/v0.2.1), unzip it, and run the setup from its `mobile-tui-remote/` directory; skip the Git commands. An additional ZIP named `reviewed-…` contains the same application source plus the current provenance documentation and verification tool. Its full source commit is listed in the release verification notes.
 
 The backend listens on `127.0.0.1:7690` and does **not** serve HTML. Host the entire `web/` directory at `/mobile/`, including `i18n.js`, CSS and `vendor/`; proxy `/mobile/ws` to the backend. A static hosting service alone cannot control a terminal. No npm install or frontend build is required.
 
@@ -90,6 +92,7 @@ The session script also accepts `TUI_WORKDIR` (defaults to `$HOME`) and optional
 
 ```bash
 python -m unittest discover -s tests -v
+python scripts/verify-source.py
 node --check web/app.js
 node --check web/i18n.js
 bash -n scripts/create-session.sh
